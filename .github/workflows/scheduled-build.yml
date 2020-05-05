@@ -1,0 +1,21 @@
+name: Build images for Docker Hub
+on:
+  push:
+    branches:
+      - add-workflow
+  schedule:
+    - cron: '0 18 * * 1' # every monday at 18 '0 18 * * 1'
+
+jobs:
+  build:
+    runs-on: ubuntu-18.04 #  add parameter
+    steps:
+      - uses: actions/checkout@v1
+      - name: Docker Login
+        run: docker login -u "${{ secrets.DOCKER_USER }}" -p "${{ secrets.DOCKER_PASSWORD }}"
+      - name: Set Tag
+        run: echo ::set-env name=DATE::$(date "+%Y%m%d")
+      - name: Build Image
+        run: docker build -t 'projectsyn/suc-ubuntu-bionic:'$DATE .
+      - name: Push Image
+        run: docker push projectsyn/suc-ubuntu-bionic:$DATE
